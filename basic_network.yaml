@@ -1,0 +1,52 @@
+Description: Basic Network
+Parameters:
+  VpcCIDR:
+    Description: VpcCidr
+    Type: String
+    Default: 10.20.0.0/16
+   
+  Enviroment:
+    Description: Enviroment
+    Type: String
+    Default: lab
+
+  Project:
+    Description: Project
+    Type: String
+    Default: FRI
+
+
+
+Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VpcCIDR #vykricnik ref je referencia
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      InstanceTenancy: default
+      Tags:
+        - {Key: Name, Value: !Join [ '-', [!Ref Enviroment, vpc]] }
+        - {Key: Enviroment, Value: !Ref Enviroment}
+        - {Key: Project, Value: !Ref Project}
+
+InternetGateway:
+  type: AWS::EC2::InternetGateway
+  properties:
+    Tags:
+      - { Key: Name, Value: Igw }
+      - { Key: Enviroment, Value: !Ref Enviroment }
+      - { Key: Project, Value: !Ref Project }
+
+InternetGatewayAttachment:
+  type: AWS::EC2::VPCGatewayAttachment
+  properties:
+    VpcId: !Ref MyVPC
+    InternetGatewayId: !Ref InternetGateway
+
+PublicSubnetA:
+  Type: AWS::EC2::Subnet
+  Properties:
+    VpcId: !Ref MyVPC
+    CidrBlock: !Select [ !Ref PublicSubnetACidrBlock, !Cidr [ !Ref VpcCIDR, 256, 8 ] ]
+    AvailabilityZone: !Select [ 0, !GetAZs !Ref '' ]
