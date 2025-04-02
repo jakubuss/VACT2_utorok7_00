@@ -50,3 +50,8 @@ PublicSubnetA:
     VpcId: !Ref MyVPC
     CidrBlock: !Select [ !Ref PublicSubnetACidrBlock, !Cidr [ !Ref VpcCIDR, 256, 8 ] ]
     AvailabilityZone: !Select [ 0, !GetAZs !Ref '' ]
+    MapPublicIpOnLaunch: true
+    Tags:
+      - { Key: Name, Value: PublicSubnetA }
+      - { Key: Enviroment, Value: !Ref Enviroment }
+      - { Key: Project, Value: !Ref Project }
